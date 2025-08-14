@@ -1,4 +1,4 @@
-package com.dayan.cookshare.service;
+package com.dayan.cookshare.service.recipe;
 
 import com.dayan.cookshare.dto.RecipeDTO;
 import com.dayan.cookshare.dto.UserDTO;
