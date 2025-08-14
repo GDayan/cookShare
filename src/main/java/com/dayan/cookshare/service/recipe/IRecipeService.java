@@ -1,5 +1,6 @@
 package com.dayan.cookshare.service.recipe;
 
+import com.dayan.cookshare.dto.RecipeDTO;
 import com.dayan.cookshare.model.Recipe;
 import com.dayan.cookshare.model.User;
 import com.dayan.cookshare.request.CreateRecipeRequest;
@@ -44,4 +45,8 @@ public interface IRecipeService {
         existingRecipe.setIngredients(request.getIngredients());
         return existingRecipe;
     }
+
+    List<RecipeDTO> getConvertedRecipes(List<Recipe> recipes);
+
+    RecipeDTO convertToDto(Recipe recipe);
 }

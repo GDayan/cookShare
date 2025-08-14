@@ -1,5 +1,7 @@
 package com.dayan.cookshare.service;
 
+import com.dayan.cookshare.dto.RecipeDTO;
+import com.dayan.cookshare.dto.UserDTO;
 import com.dayan.cookshare.model.Recipe;
 import com.dayan.cookshare.model.User;
 import com.dayan.cookshare.repository.RecipeRepository;
@@ -9,6 +11,7 @@ import com.dayan.cookshare.request.UpdateRecipeRequest;
 import com.dayan.cookshare.service.recipe.IRecipeService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class RecipeService implements IRecipeService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
     @Override
     public Recipe createRecipe(CreateRecipeRequest request) {
         if(request == null || request.getUser() == null){
@@ -74,5 +78,18 @@ public class RecipeService implements IRecipeService {
                 .stream()
                 .map(Recipe :: getCuisine)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<RecipeDTO> getConvertedRecipes(List<Recipe> recipes){
+        return recipes.stream().map(this :: convertToDto).toList();
+    }
+
+    @Override
+    public RecipeDTO convertToDto(Recipe recipe){
+        RecipeDTO recipeDTO = modelMapper.map(recipe, RecipeDTO.class);
+        UserDTO userDTO = modelMapper.map(recipe.getUser(), UserDTO.class);
+        recipeDTO.setUser(userDTO);
+        return recipeDTO;
     }
 }
