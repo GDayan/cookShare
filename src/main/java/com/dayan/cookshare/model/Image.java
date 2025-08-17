@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Blob;
-
 @Entity
 @Getter
 @Setter
@@ -18,14 +16,17 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String fileName;
+
     private String fileType;
 
     @Lob
-    private Blob image;
+    @Column(name = "image", columnDefinition = "BYTEA")
+    private byte[] image;
 
     private String downloadUrl;
 
     @OneToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
+
 }

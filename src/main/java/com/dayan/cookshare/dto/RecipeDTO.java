@@ -13,7 +13,8 @@ public class RecipeDTO {
     private String category;
     private String description;
     private String cuisine;
-
+    private ImageDTO imageDTO;
+    private Long likeCount;
     private UserDTO user;
 
 }

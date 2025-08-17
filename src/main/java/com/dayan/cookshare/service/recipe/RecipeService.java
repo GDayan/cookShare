@@ -1,14 +1,16 @@
 package com.dayan.cookshare.service.recipe;
 
+import com.dayan.cookshare.dto.ImageDTO;
 import com.dayan.cookshare.dto.RecipeDTO;
 import com.dayan.cookshare.dto.UserDTO;
+import com.dayan.cookshare.model.Image;
 import com.dayan.cookshare.model.Recipe;
 import com.dayan.cookshare.model.User;
+import com.dayan.cookshare.repository.ImageRepository;
 import com.dayan.cookshare.repository.RecipeRepository;
 import com.dayan.cookshare.repository.UserRepository;
 import com.dayan.cookshare.request.CreateRecipeRequest;
 import com.dayan.cookshare.request.UpdateRecipeRequest;
-import com.dayan.cookshare.service.recipe.IRecipeService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -25,6 +27,7 @@ public class RecipeService implements IRecipeService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
     @Override
     public Recipe createRecipe(CreateRecipeRequest request) {
         if(request == null || request.getUser() == null){
@@ -89,6 +92,8 @@ public class RecipeService implements IRecipeService {
     public RecipeDTO convertToDto(Recipe recipe){
         RecipeDTO recipeDTO = modelMapper.map(recipe, RecipeDTO.class);
         UserDTO userDTO = modelMapper.map(recipe.getUser(), UserDTO.class);
+        Optional<Image> image = Optional.ofNullable(imageRepository.findByRecipeId(recipe.getId()));
+        image.map(img -> modelMapper.map(img, ImageDTO.class)).ifPresent(recipeDTO :: setImageDTO);
         recipeDTO.setUser(userDTO);
         return recipeDTO;
     }

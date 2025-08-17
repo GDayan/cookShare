@@ -21,6 +21,8 @@ public class Like {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
-    //private User user;
+    public Like(Recipe recipe) {
+        this.recipe = recipe;
+    }
 
 }
