@@ -50,15 +50,14 @@ public class ImageService implements IImageService{
             Image image = new Image();
             image.setFileName(file.getOriginalFilename());
             image.setFileType(file.getContentType());
-            image.setImage(file.getBytes()); // ✅ напрямую массив
+            image.setImage(file.getBytes()); // массив байтов
             image.setRecipe(recipe);
 
-            String buildDownloadUrl = "/api/images/image/download/";
-            image.setDownloadUrl(buildDownloadUrl);
+            Image savedImage = imageRepository.save(image); // сохраняем один раз
 
-            Image savedImage = imageRepository.save(image);
-            savedImage.setDownloadUrl(buildDownloadUrl + savedImage.getId());
-            imageRepository.save(savedImage);
+            String buildDownloadUrl = "/api/images/image/download/" + savedImage.getId();
+            savedImage.setDownloadUrl(buildDownloadUrl);
+            imageRepository.save(savedImage); // можно оставить, если нужен URL после ID
 
             ImageDTO imageDto = new ImageDTO();
             imageDto.setId(savedImage.getId());

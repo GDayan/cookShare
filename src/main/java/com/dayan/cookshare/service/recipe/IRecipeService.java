@@ -11,37 +11,43 @@ import java.util.Set;
 
 public interface IRecipeService {
     Recipe createRecipe(CreateRecipeRequest request);
+
     List<Recipe> getAllRecipe();
-    Recipe getRecipeById(Long recipeId);
+
+    Recipe getRecipeById(Long id);
+
     Recipe updateRecipe(UpdateRecipeRequest request, Long recipeId);
 
     void deleteRecipe(Long recipeId);
-    Set<String> getAllRecipeByCategories();
-    Set<String> getAllRecipeByCuisine();
+
+    Set<String> getAllRecipeCategories();
+
+    Set<String> getAllRecipeCuisine();
+
 
     static Recipe createRecipe(CreateRecipeRequest request, User user) {
         Recipe recipe = new Recipe();
         Recipe createRequest = request.getRecipe();
         recipe.setTitle(createRequest.getTitle());
-        recipe.setCategory(createRequest.getCategory());
         recipe.setCuisine(createRequest.getCuisine());
+        recipe.setCategory(createRequest.getCategory());
         recipe.setInstruction(createRequest.getInstruction());
         recipe.setDescription(createRequest.getDescription());
-        recipe.setCookTime(createRequest.getCookTime());
         recipe.setPrepTime(createRequest.getPrepTime());
+        recipe.setCookTime(createRequest.getCookTime());
         recipe.setIngredients(createRequest.getIngredients());
         recipe.setUser(user);
         return recipe;
     }
 
-    static Recipe updateRecipe(Recipe existingRecipe, UpdateRecipeRequest request) {
+    static Recipe updateRecipe(Recipe existingRecipe, UpdateRecipeRequest request){
         existingRecipe.setTitle(request.getTitle());
-        existingRecipe.setCategory(request.getCategory());
-        existingRecipe.setCuisine(request.getCuisine());
-        existingRecipe.setInstruction(request.getInstruction());
         existingRecipe.setDescription(request.getDescription());
-        existingRecipe.setCookTime(request.getCookTime());
+        existingRecipe.setInstruction(request.getInstruction());
+        existingRecipe.setCuisine(request.getCuisine());
         existingRecipe.setPrepTime(request.getPrepTime());
+        existingRecipe.setCookTime(request.getCookTime());
+        existingRecipe.setCategory(request.getCategory());
         existingRecipe.setIngredients(request.getIngredients());
         return existingRecipe;
     }

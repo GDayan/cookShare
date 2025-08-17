@@ -2,12 +2,15 @@ package com.dayan.cookshare.service.recipe;
 
 import com.dayan.cookshare.dto.ImageDTO;
 import com.dayan.cookshare.dto.RecipeDTO;
+import com.dayan.cookshare.dto.ReviewDTO;
 import com.dayan.cookshare.dto.UserDTO;
 import com.dayan.cookshare.model.Image;
 import com.dayan.cookshare.model.Recipe;
+import com.dayan.cookshare.model.Review;
 import com.dayan.cookshare.model.User;
 import com.dayan.cookshare.repository.ImageRepository;
 import com.dayan.cookshare.repository.RecipeRepository;
+import com.dayan.cookshare.repository.ReviewRepository;
 import com.dayan.cookshare.repository.UserRepository;
 import com.dayan.cookshare.request.CreateRecipeRequest;
 import com.dayan.cookshare.request.UpdateRecipeRequest;
@@ -28,20 +31,23 @@ public class RecipeService implements IRecipeService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final ImageRepository imageRepository;
+    private final ReviewRepository reviewRepository;
+
     @Override
     public Recipe createRecipe(CreateRecipeRequest request) {
         if(request == null || request.getUser() == null){
-            throw new IllegalArgumentException("не верный запрос");
+            throw new IllegalArgumentException("Invalid request");
         }
         User user = Optional.ofNullable(userRepository.findByUsername(request.getUser().getUsername()))
-                .map(existingUser -> {existingUser.getRecipe().add(request.getRecipe());
+                .map(existingUser -> {
+                    existingUser.getRecipe().add(request.getRecipe());
                     return existingUser;
                 }).orElseGet(() -> {
                     User newUser = new User(request.getUser().getUsername());
                     userRepository.save(newUser);
                     return newUser;
                 });
-        Recipe recipe= IRecipeService.createRecipe(request, user);
+        Recipe recipe = IRecipeService.createRecipe(request, user);
         return recipeRepository.save(recipe);
     }
 
@@ -58,17 +64,19 @@ public class RecipeService implements IRecipeService {
     }
 
     @Override
-    public Recipe getRecipeById(Long recipeId) {
-        return recipeRepository.findById(recipeId).orElseThrow(() -> new EntityNotFoundException("Рецепт не найден"));
+    public Recipe getRecipeById(Long id) {
+        return recipeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Recipe not found"));
     }
 
     @Override
     public void deleteRecipe(Long recipeId) {
         recipeRepository.deleteById(recipeId);
+
     }
 
     @Override
-    public Set<String> getAllRecipeByCategories() {
+    public Set<String> getAllRecipeCategories() {
         return recipeRepository.findAll()
                 .stream()
                 .map(Recipe :: getCategory)
@@ -76,13 +84,12 @@ public class RecipeService implements IRecipeService {
     }
 
     @Override
-    public Set<String> getAllRecipeByCuisine() {
+    public Set<String> getAllRecipeCuisine() {
         return recipeRepository.findAll()
                 .stream()
                 .map(Recipe :: getCuisine)
                 .collect(Collectors.toSet());
     }
-
     @Override
     public List<RecipeDTO> getConvertedRecipes(List<Recipe> recipes){
         return recipes.stream().map(this :: convertToDto).toList();
@@ -90,11 +97,19 @@ public class RecipeService implements IRecipeService {
 
     @Override
     public RecipeDTO convertToDto(Recipe recipe){
-        RecipeDTO recipeDTO = modelMapper.map(recipe, RecipeDTO.class);
-        UserDTO userDTO = modelMapper.map(recipe.getUser(), UserDTO.class);
-        Optional<Image> image = Optional.ofNullable(imageRepository.findByRecipeId(recipe.getId()));
-        image.map(img -> modelMapper.map(img, ImageDTO.class)).ifPresent(recipeDTO :: setImageDTO);
-        recipeDTO.setUser(userDTO);
-        return recipeDTO;
+        RecipeDTO recipeDto = modelMapper.map(recipe, RecipeDTO.class);
+        UserDTO userDto = modelMapper.map(recipe.getUser(), UserDTO.class);
+        Optional<Image> image  = Optional.ofNullable(imageRepository.findByRecipeId(recipe.getId()));
+        image.map(img -> modelMapper.map(img, ImageDTO.class)).ifPresent(recipeDto ::setImageDto);
+        List<ReviewDTO> reviews = reviewRepository.findAllByRecipeId(recipe.getId())
+                .stream()
+                .map(review -> modelMapper.map(review, ReviewDTO.class)).toList();
+
+        recipeDto.setTotalRateCount(recipe.getTotalRateCount());
+        recipeDto.setAverageRating(recipe.calculateAverageRatings());
+
+        recipeDto.setUser(userDto);
+        recipeDto.setReviews(reviews);
+        return recipeDto;
     }
 }

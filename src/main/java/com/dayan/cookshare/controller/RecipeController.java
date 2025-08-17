@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/recipes")
 public class RecipeController {
     private final IRecipeService recipeService;
@@ -25,12 +25,11 @@ public class RecipeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RecipeDTO>> getAllRecipe(){
+    public ResponseEntity<List<RecipeDTO>> getAllRecipes(){
         List<Recipe> recipes = recipeService.getAllRecipe();
         List<RecipeDTO> recipeDto = recipeService.getConvertedRecipes(recipes);
         return ResponseEntity.ok(recipeDto);
     }
-
     @GetMapping("/{recipeId}/recipe")
     public ResponseEntity<RecipeDTO> getRecipeById(@PathVariable Long recipeId){
         RecipeDTO recipe = recipeService.convertToDto(recipeService.getRecipeById(recipeId));
@@ -38,25 +37,29 @@ public class RecipeController {
     }
 
     @PutMapping("/{recipeId}/update")
-    public ResponseEntity<RecipeDTO> updateRecipe(@RequestBody UpdateRecipeRequest request, @PathVariable Long recipeId){
-        Recipe updatedRecipe = recipeService.updateRecipe(request, recipeId);
-        RecipeDTO recipeDTO = recipeService.convertToDto(updatedRecipe);
-        return ResponseEntity.ok(recipeDTO);
+    public ResponseEntity<RecipeDTO> updateRecipe(@PathVariable Long recipeId, @RequestBody UpdateRecipeRequest request) {
+        Recipe updatedRecipe = recipeService.updateRecipe(request,recipeId);
+        RecipeDTO recipeDto = recipeService.convertToDto(updatedRecipe);
+        return ResponseEntity.ok(recipeDto);
     }
 
+
+
     @DeleteMapping("/{recipeId}/delete")
-    public ResponseEntity<Void> deleteRecipe(@PathVariable Long recipeId){
+    public ResponseEntity<Void> deleteRecipe(@PathVariable Long recipeId) {
         recipeService.deleteRecipe(recipeId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/categories")
     public ResponseEntity<Set<String>> getAllCategories(){
-        return ResponseEntity.ok(recipeService.getAllRecipeByCategories());
+        return ResponseEntity.ok(recipeService.getAllRecipeCategories());
     }
 
     @GetMapping("/cuisines")
     public ResponseEntity<Set<String>> getAllCuisines(){
-        return ResponseEntity.ok(recipeService.getAllRecipeByCuisine());
+        return ResponseEntity.ok(recipeService.getAllRecipeCuisine());
     }
+
+
 }

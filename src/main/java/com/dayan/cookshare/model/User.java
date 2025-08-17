@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "app_user")
-public class User{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +28,7 @@ public class User{
     @Transient
     private List<Review> reviews;
 
-    public User (String username){
+    public User(String username) {
         this.username = username;
     }
 }

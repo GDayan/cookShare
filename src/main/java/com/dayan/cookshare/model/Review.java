@@ -16,7 +16,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int stars;
-    private String feedback;
+    private String feedBack;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -24,5 +24,5 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
-    private Recipe recipe;
+    private  Recipe recipe;
 }
